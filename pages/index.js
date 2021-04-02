@@ -1,65 +1,242 @@
-import Head from 'next/head'
-import styles from '../styles/Home.module.css'
+import { useState, useEffect } from "react";
+import Link from "next/link";
+import {
+	Divider,
+    Table,
+    Thead,
+    Tbody,
+    Tfoot,
+    Tr,
+    Th,
+    Td,
+    TableCaption,
+    Avatar,
+    Spinner,
+    Stat,
+    StatHelpText,
+    StatArrow,
+    Tag,
+} from "@chakra-ui/react";
+import Head from 'next/head';
 
-export default function Home() {
-  return (
-    <div className={styles.container}>
-      <Head>
-        <title>Create Next App</title>
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
+const Homepage = ({ data }) => {
+    const [coins, setCoins] = useState([]);
 
-      <main className={styles.main}>
-        <h1 className={styles.title}>
-          Welcome to <a href="https://nextjs.org">Next.js!</a>
-        </h1>
+    useEffect(() => {
+        setCoins(data);
+    }, []);
 
-        <p className={styles.description}>
-          Get started by editing{' '}
-          <code className={styles.code}>pages/index.js</code>
-        </p>
+    return (
+		<>
+		<Head>
+			<title>Cryptocurrency Stats</title>
+			<meta name="description" content="Cryptocurrency Stats and Prices"></meta>
+			<meta name="viewport" content="initial-scale=1.0, width=device-width" />
+		</Head>
 
-        <div className={styles.grid}>
-          <a href="https://nextjs.org/docs" className={styles.card}>
-            <h3>Documentation &rarr;</h3>
-            <p>Find in-depth information about Next.js features and API.</p>
-          </a>
-
-          <a href="https://nextjs.org/learn" className={styles.card}>
-            <h3>Learn &rarr;</h3>
-            <p>Learn about Next.js in an interactive course with quizzes!</p>
-          </a>
-
-          <a
-            href="https://github.com/vercel/next.js/tree/master/examples"
-            className={styles.card}
-          >
-            <h3>Examples &rarr;</h3>
-            <p>Discover and deploy boilerplate example Next.js projects.</p>
-          </a>
-
-          <a
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-            className={styles.card}
-          >
-            <h3>Deploy &rarr;</h3>
-            <p>
-              Instantly deploy your Next.js site to a public URL with Vercel.
-            </p>
-          </a>
-        </div>
-      </main>
-
-      <footer className={styles.footer}>
-        <a
-          href="https://vercel.com?utm_source=create-next-app&utm_medium=default-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
+        <Table
+            variant="simple"
+            size="md"
+            border="1px"
+            borderColor="gray.200"
+            borderRadius="4"
+            my={6}
+            boxShadow="lg"
+            p="6"
+            rounded="md"
+            bg="white"
         >
-          Powered by{' '}
-          <img src="/vercel.svg" alt="Vercel Logo" className={styles.logo} />
-        </a>
-      </footer>
-    </div>
-  )
+            <TableCaption>
+				<a href="https://github.com/agustinl/crypto-stats" target="_blank">GitHub</a> &#8212; {new Date().getFullYear()} Crypto Stats
+            </TableCaption>
+            <Thead>
+                <Tr>
+                    <Th></Th>
+                    <Th>Name</Th>
+                    <Th>Symbol</Th>
+                    <Th>Price</Th>
+                    <Th>&#126; 1 hs</Th>
+                    <Th>&#126; 24 hours</Th>
+                    <Th>&#126; 7 days</Th>
+                    <Th>&#126; 30 days</Th>
+                    <Th>Market cap (USD)</Th>
+                </Tr>
+            </Thead>
+            <Tbody>
+                {coins.length ? (
+                    coins.map((coin) => (
+                        <Tr fontSize="sm" key={coin.id}>
+                            <Td>
+                                <Avatar
+                                    size="sm"
+                                    name={coin.name}
+                                    src={coin.image}
+                                    background="none"
+                                />
+                            </Td>
+                            <Td>
+                                <b>
+                                    <Link
+                                        href={`/coin/${encodeURIComponent(
+                                            coin.id
+                                        )}`}
+                                    >
+                                        {coin.name}
+                                    </Link>
+                                </b>
+                            </Td>
+                            <Td>
+                                <Tag>{coin.symbol.toUpperCase()}</Tag>
+                            </Td>
+                            <Td>{coin.current_price.toLocaleString()} USD</Td>
+                            <Td>
+                                <Stat
+                                    color={
+                                        Math.sign(
+                                            coin.price_change_percentage_1h_in_currency
+                                        ) === 1
+                                            ? "green.500"
+                                            : "red.500"
+                                    }
+                                >
+                                    <StatHelpText>
+                                        <StatArrow
+                                            type={
+                                                Math.sign(
+                                                    coin.price_change_percentage_1h_in_currency
+                                                ) === 1
+                                                    ? "increase"
+                                                    : "decrease"
+                                            }
+                                        />
+                                        {coin.price_change_percentage_1h_in_currency.toFixed(
+                                            2
+                                        )}
+                                        %
+                                    </StatHelpText>
+                                </Stat>
+                            </Td>
+                            <Td>
+                                <Stat
+                                    color={
+                                        Math.sign(
+                                            coin.price_change_percentage_24h
+                                        ) === 1
+                                            ? "green.500"
+                                            : "red.500"
+                                    }
+                                >
+                                    <StatHelpText>
+                                        <StatArrow
+                                            type={
+                                                Math.sign(
+                                                    coin.price_change_percentage_24h
+                                                ) === 1
+                                                    ? "increase"
+                                                    : "decrease"
+                                            }
+                                        />
+                                        {coin.price_change_percentage_24h.toFixed(
+                                            2
+                                        )}
+                                        %
+                                    </StatHelpText>
+                                </Stat>
+                            </Td>
+                            <Td>
+                                <Stat
+                                    color={
+                                        Math.sign(
+                                            coin.price_change_percentage_7d_in_currency
+                                        ) === 1
+                                            ? "green.500"
+                                            : "red.500"
+                                    }
+                                >
+                                    <StatHelpText>
+                                        <StatArrow
+                                            type={
+                                                Math.sign(
+                                                    coin.price_change_percentage_7d_in_currency
+                                                ) === 1
+                                                    ? "increase"
+                                                    : "decrease"
+                                            }
+                                        />
+                                        {coin.price_change_percentage_7d_in_currency.toFixed(
+                                            2
+                                        )}
+                                        %
+                                    </StatHelpText>
+                                </Stat>
+                            </Td>
+                            <Td>
+                                <Stat
+                                    color={
+                                        Math.sign(
+                                            coin.price_change_percentage_30d_in_currency
+                                        ) === 1
+                                            ? "green.500"
+                                            : "red.500"
+                                    }
+                                >
+                                    <StatHelpText>
+                                        <StatArrow
+                                            type={
+                                                Math.sign(
+                                                    coin.price_change_percentage_30d_in_currency
+                                                ) === 1
+                                                    ? "increase"
+                                                    : "decrease"
+                                            }
+                                        />
+                                        {coin.price_change_percentage_30d_in_currency.toFixed(
+                                            2
+                                        )}
+                                        %
+                                    </StatHelpText>
+                                </Stat>
+                            </Td>
+                            <Td>{coin.market_cap.toLocaleString()}</Td>
+                        </Tr>
+                    ))
+                ) : (
+                    <Spinner size="md" mx="auto" />
+                )}
+            </Tbody>
+            <Tfoot>
+                <Tr>
+                    <Th></Th>
+                    <Th>Name</Th>
+                    <Th>Symbol</Th>
+                    <Th>Price</Th>
+                    <Th>&#126; 1 hour</Th>
+                    <Th>&#126; 24 hours</Th>
+                    <Th>&#126; 7 days</Th>
+                    <Th>&#126; 30 days</Th>
+                    <Th>Market cap (USD)</Th>
+                </Tr>
+            </Tfoot>
+        </Table>
+		</>
+    );
+};
+
+export async function getStaticProps(context) {
+    const res = await fetch(
+        `https://api.coingecko.com/api/v3/coins/markets/?vs_currency=usd&per_page=20&price_change_percentage=1h,7d,30d`
+    );
+    const data = await res.json();
+
+    if (!data) {
+        return {
+            notFound: true,
+        };
+    }
+
+    return {
+        props: { data }, // will be passed to the page component as props
+    };
 }
+
+export default Homepage;
